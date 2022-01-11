@@ -1,18 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="background_grey">#FFE9E9</color>
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#C9B5F6</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-    <color name="pink">#FF0059</color>
-    <color name="background_grey">#FFE9E9</color>
-    <color name="red">#FF0000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="background_color">#FFFFFF</color>
+    <color name="red">#EA272D</color>
     <color name="yellow">#DCFFFD1E</color>
     <color name="blue">#2196F3</color>
     <color name="grey">#8E8E8E</color>
     <color name="transparent_color">#00ffffff</color>
     <color name="light_grey">#F6F6F6</color>
+    <color name="light_purple">#ED37ED</color>
+    <color name="dim_orange">#FFB8A1</color>
+    <color name="light_orange">#AEFF6633</color>
+    <color name="orange">#ff6633</color>
+    <color name="dark_orange">#ff3333</color>
+    <color name="green">#722ead</color>
+    <color name="light_green">#03DD9A</color>
+    <color name="dark_blue">#2563eb</color>
+    <color name="dark_green">#009966</color>
+    <color name="paste_color">#009999</color>
+    <color name="default_color">#00bb55</color>
+    <color name="indigo">#4f46e5</color>
 </resources>

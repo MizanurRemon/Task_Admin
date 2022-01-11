@@ -22,44 +22,10 @@
             android:gravity="center"
             android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
+            <ImageView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/touche"
-                    android:text="T"
-                    android:textColor="@color/pink"
-                    android:textSize="50sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/touche"
-                    android:text="heme"
-                    android:textColor="@color/black"
-                    android:textSize="50sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/touche"
-                    android:text="L"
-                    android:textColor="@color/pink"
-                    android:textSize="50sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/touche"
-                    android:text="ooks"
-                    android:textColor="@color/black"
-                    android:textSize="50sp" />
-
-            </LinearLayout>
+                android:src="@drawable/logo" />
 
             <LinearLayout
                 android:layout_width="match_parent"
