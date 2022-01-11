@@ -6,30 +6,46 @@ import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Base64;
+import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.themelooks_admin.Adapter.Variant_adapter;
+import com.example.themelooks_admin.Model.APIUtilize;
+import com.example.themelooks_admin.Model.Products.Products_API;
+import com.example.themelooks_admin.Model.Products.Products_response;
+import com.example.themelooks_admin.Model.Products.Products_variant_response;
 import com.example.themelooks_admin.R;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class View_product_fragment extends Fragment {
 
     ImageView backButton;
-    String name, color, size, price, description, image;
-    TextView productNameText, colorText, sizeText, priceText, descriptionText;
+    String productID, color, size, price, description, image;
+    TextView productNameText, descriptionText;
     ImageView productImage;
+    RecyclerView variantView;
+    Products_API productsApi;
+    List<Products_variant_response> variantList;
+    Variant_adapter adapter;
 
-    public View_product_fragment(String name, String color, String size, String price, String description, String image) {
-        this.name = name;
-        this.color = color;
-        this.size = size;
-        this.price = price;
-        this.description = description;
-        this.image = image;
+    public View_product_fragment(String productID) {
+        this.productID = productID;
+
     }
 
     @Override
@@ -37,22 +53,49 @@ public class View_product_fragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         main();
+
+        product_variant_list();
+    }
+
+    private void product_variant_list() {
+        productsApi.getProductVariant(productID).enqueue(new Callback<List<Products_variant_response>>() {
+            @Override
+            public void onResponse(Call<List<Products_variant_response>> call, Response<List<Products_variant_response>> response) {
+                //Toast.makeText(getActivity(), String.valueOf(response.body().size()), Toast.LENGTH_SHORT).show();
+                variantList = new ArrayList<>();
+                variantList = response.body();
+                adapter = new Variant_adapter(variantList);
+                variantView.setAdapter(adapter);
+            }
+
+            @Override
+            public void onFailure(Call<List<Products_variant_response>> call, Throwable t) {
+
+            }
+        });
     }
 
     private void main() {
 
-        productNameText.setText(name);
-        colorText.setText(color);
-        sizeText.setText(size);
-        priceText.setText(price);
-        descriptionText.setText(description);
+       // Toast.makeText(getActivity(), "main", Toast.LENGTH_SHORT).show();
+        productsApi.getProductDetails(productID).enqueue(new Callback<Products_response>() {
+            @Override
+            public void onResponse(Call<Products_response> call, Response<Products_response> response) {
 
-        if(!image.equals("xyz")){
-            Bitmap bm = StringToBitMap(image);
-            productImage.setImageBitmap(bm);
-        } else {
-            productImage.setImageResource(R.drawable.google_icon);
-        }
+                productNameText.setText(response.body().getName());
+                descriptionText.setText(response.body().getDescription());
+                image = response.body().getImage();
+                Bitmap bm = StringToBitMap(image);
+                productImage.setImageBitmap(bm);
+
+            }
+
+            @Override
+            public void onFailure(Call<Products_response> call, Throwable t) {
+
+            }
+        });
+
     }
 
     public Bitmap StringToBitMap(String encodedString) {
@@ -71,25 +114,24 @@ public class View_product_fragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.view_product_fragment, container, false);
 
+        productsApi = APIUtilize.productsApi();
+
         backButton = (ImageView) view.findViewById(R.id.backButtonID);
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getActivity().getSupportFragmentManager().beginTransaction().setCustomAnimations(
-                        R.anim.slide_in,  // enter
-                        R.anim.fade_out,  // exit
-                        R.anim.fade_in,   // popEnter
-                        R.anim.slide_out  // popExit
-                ).replace(R.id.frame_container, new Home_fragment()).commit();
+                getActivity().getSupportFragmentManager().popBackStack();
             }
         });
 
         productNameText = view.findViewById(R.id.productNameID);
-        colorText = view.findViewById(R.id.colorTextID);
-        sizeText = view.findViewById(R.id.sizeTextID);
-        priceText = view.findViewById(R.id.priceTextID);
+
         descriptionText = view.findViewById(R.id.descriptionTextID);
         productImage = view.findViewById(R.id.productImageID);
+
+        variantView = view.findViewById(R.id.variantViewID);
+        variantView.setHasFixedSize(true);
+        variantView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         return view;
     }

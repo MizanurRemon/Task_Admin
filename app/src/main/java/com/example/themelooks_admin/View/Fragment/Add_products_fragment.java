@@ -233,7 +233,7 @@ public class Add_products_fragment extends Fragment {
         });
 
         variantList = new ArrayList<>();
-        productVariant = new Product_variant();
+
 
         addVariantButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -247,6 +247,7 @@ public class Add_products_fragment extends Fragment {
                 if (TextUtils.isEmpty(size) || TextUtils.isEmpty(color) || TextUtils.isEmpty(amount) || TextUtils.isEmpty(price_range)) {
                     Toast.makeText(getActivity(), "Empty filed", Toast.LENGTH_SHORT).show();
                 } else {
+                    productVariant = new Product_variant();
                     productVariant.setSize(size);
                     productVariant.setColor(color);
                     productVariant.setAmount(amount);
@@ -258,11 +259,9 @@ public class Add_products_fragment extends Fragment {
                     amountEditText.getText().clear();
                     priceRangeEditText.getText().clear();
 
-                    //Toast.makeText(getActivity(), String.valueOf(variantList.size()), Toast.LENGTH_SHORT).show();
-
-                    for (int i = 0; i<variantList.size();i++){
+                    /*for (int i = 0; i<variantList.size();i++){
                         Log.d("variantListXX", String.valueOf(variantList.get(i).getSize()));
-                    }
+                    }*/
 
                 }
 

@@ -113,18 +113,7 @@ public class Home_fragment extends Fragment implements Product_adapter.OnItemCli
     public void OnItemClick(int position) {
         Products_response response = productsList.get(position);
         String productID = String.valueOf(response.getProductsID());
-        String name = response.getName();
-        String color = response.getColor();
-        String size = response.getSize();
-        String price = response.getPrice();
-        String description = response.getDescription();
-        String image = response.getImage();
 
-        getActivity().getSupportFragmentManager().beginTransaction().setCustomAnimations(
-                R.anim.slide_in,  // enter
-                R.anim.fade_out,  // exit
-                R.anim.fade_in,   // popEnter
-                R.anim.slide_out  // popExit
-        ).replace(R.id.frame_container, new View_product_fragment(name, color, size, price, description, image)).addToBackStack(null).commit();
+        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, new View_product_fragment(productID)).addToBackStack(null).commit();
     }
 }

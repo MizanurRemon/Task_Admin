@@ -14,4 +14,12 @@ public interface Products_API {
 
     @GET("/products")
     Call<List<Products_response>> getProducts();
+
+    @FormUrlEncoded
+    @POST("/products_variant_details")
+    Call<List<Products_variant_response>> getProductVariant(@Field("productsID") String productsID);
+
+    @FormUrlEncoded
+    @POST("/products_details")
+    Call<Products_response> getProductDetails(@Field("productsID") String productsID);
 }

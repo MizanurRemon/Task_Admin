@@ -4,6 +4,8 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Educational/Apps/Themelooks_Admin/app/src/main/res/drawable/add_icon.xml" value="0.20925925925925926" />
+        <entry key="..\:/Educational/Apps/Themelooks_Admin/app/src/main/res/drawable/round_shape.xml" value="0.2203125" />
+        <entry key="..\:/Educational/Apps/Themelooks_Admin/app/src/main/res/drawable/shape_top.xml" value="0.2203125" />
         <entry key="..\:/Educational/Apps/Themelooks_Admin/app/src/main/res/drawable/spinner_shape.xml" value="0.2203125" />
         <entry key="..\:/Educational/Apps/Themelooks_Admin/app/src/main/res/layout/activity_main.xml" value="0.20416666666666666" />
         <entry key="..\:/Educational/Apps/Themelooks_Admin/app/src/main/res/layout/add_products_fragment.xml" value="0.20416666666666666" />
@@ -11,6 +13,7 @@
         <entry key="..\:/Educational/Apps/Themelooks_Admin/app/src/main/res/layout/home_fragment.xml" value="0.20416666666666666" />
         <entry key="..\:/Educational/Apps/Themelooks_Admin/app/src/main/res/layout/loader_alert.xml" value="0.20416666666666666" />
         <entry key="..\:/Educational/Apps/Themelooks_Admin/app/src/main/res/layout/login_fragment.xml" value="0.2" />
+        <entry key="..\:/Educational/Apps/Themelooks_Admin/app/src/main/res/layout/variant_card.xml" value="0.20416666666666666" />
         <entry key="..\:/Educational/Apps/Themelooks_Admin/app/src/main/res/layout/view_product_fragment.xml" value="0.20416666666666666" />
       </map>
     </option>
