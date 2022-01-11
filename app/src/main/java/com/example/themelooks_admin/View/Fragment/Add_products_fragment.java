@@ -3,10 +3,13 @@ package com.example.themelooks_admin.View.Fragment;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -16,8 +19,10 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,8 +34,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.themelooks_admin.Model.APIUtilize;
 import com.example.themelooks_admin.Model.AddProducts.Add_product_response;
+import com.example.themelooks_admin.Model.AddProducts.Add_products_API;
 import com.example.themelooks_admin.Model.AddProducts.Price_response;
+import com.example.themelooks_admin.Model.AddProducts.Product_variant;
 import com.example.themelooks_admin.R;
 import com.example.themelooks_admin.ViewModel.AddProductsViewModel;
 import com.google.android.material.textfield.TextInputEditText;
@@ -39,19 +47,21 @@ import com.google.android.material.textfield.TextInputLayout;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
-public class Add_products_fragment extends Fragment implements AdapterView.OnItemSelectedListener {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class Add_products_fragment extends Fragment {
 
     ImageView backButton;
     String userID;
-    Spinner colorSpinner, sizeSpinner;
-    String[] colorList = {"White", "Black"};
-    String[] sizeList = {"Large", "Small"};
-    String color, size;
     AddProductsViewModel addProductsViewModel;
-    TextView priceText, addProductButton, descriptionText;
+    TextView addProductButton, descriptionText;
     EditText productName;
-    int count = 0;
 
     ImageView pickImageButton;
     private static final int PICK_IMAGE_REQUEST = 1, CAMERA_REQUEST = 1;
@@ -60,6 +70,16 @@ public class Add_products_fragment extends Fragment implements AdapterView.OnIte
     private Bitmap bitmap;
     String imgdata;
     int check = 0, final_check = 0;
+    Dialog loader;
+    Add_products_API addProductsApi;
+    ImageView addVariantButton;
+    EditText sizeEditText, colorEditText, amountEditText, priceRangeEditText;
+
+    List<Product_variant> variantList;
+    int variant = 0;
+    Product_variant productVariant;
+    int count = 0;
+
 
     public Add_products_fragment(String userID) {
         this.userID = userID;
@@ -77,7 +97,7 @@ public class Add_products_fragment extends Fragment implements AdapterView.OnIte
             @Override
             public void onChanged(Price_response price_response) {
                 String price = price_response.getPrice();
-                priceText.setText(price);
+
             }
         });
     }
@@ -86,30 +106,18 @@ public class Add_products_fragment extends Fragment implements AdapterView.OnIte
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == CAMERA_REQUEST) {
-                Bundle bundle = data.getExtras();
-
-                if (check == 1) {
-                    bitmap = (Bitmap) bundle.get("data");
-                    check = 0;
-                    final_check = 1;
-                    pickImageButton.setImageBitmap(bitmap);
-                }
-
-
-            } else if (requestCode == IMAGE_REQUEST_CODE) {
+            if (requestCode == IMAGE_REQUEST_CODE) {
                 filepath = data.getData();
                 try {
                     InputStream inputStream = getActivity().getContentResolver().openInputStream(filepath);
-
-                    if (check == 1) {
-                        check = 0;
-                        final_check = 1;
-                        bitmap = BitmapFactory.decodeStream(inputStream);
-                        pickImageButton.setImageBitmap(bitmap);
-                    }
-
-                } catch (FileNotFoundException e) {
+                    bitmap = BitmapFactory.decodeStream(inputStream);
+                    bitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth() / 2, bitmap.getHeight() / 2, false);
+                    //selectedImage.setImageBitmap(bitmap);
+                    pickImageButton.setImageURI(filepath);
+                    check = 1;
+                    //uriStrng = uri.toString();
+                    //Toast.makeText(getApplicationContext(), "2", Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -122,22 +130,29 @@ public class Add_products_fragment extends Fragment implements AdapterView.OnIte
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.add_products_fragment, container, false);
 
+        addVariantButton = view.findViewById(R.id.addVariantButtonID);
+        sizeEditText = view.findViewById(R.id.sizeEditTextID);
+        colorEditText = view.findViewById(R.id.colorEditTextID);
+        amountEditText = view.findViewById(R.id.amountEditTextID);
+        priceRangeEditText = view.findViewById(R.id.priceRangeEditTextID);
+
+
         addProductsViewModel = new ViewModelProvider(this).get(AddProductsViewModel.class);
+        addProductsApi = APIUtilize.addProductsApi();
+
+        loader = new Dialog(getActivity());
+        loader.setContentView(R.layout.loader_alert);
+        loader.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        loader.setCancelable(false);
 
         backButton = (ImageView) view.findViewById(R.id.backButtonID);
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getActivity().getSupportFragmentManager().beginTransaction().setCustomAnimations(
-                        R.anim.slide_in,  // enter
-                        R.anim.fade_out,  // exit
-                        R.anim.fade_in,   // popEnter
-                        R.anim.slide_out  // popExit
-                ).replace(R.id.frame_container, new Home_fragment()).commit();
+                getActivity().getSupportFragmentManager().popBackStack();
             }
         });
 
-        priceText = (TextView) view.findViewById(R.id.priceTextID);
         descriptionText = (TextView) view.findViewById(R.id.descriptionTextID);
         addProductButton = (TextView) view.findViewById(R.id.addProductButtonID);
 
@@ -145,28 +160,12 @@ public class Add_products_fragment extends Fragment implements AdapterView.OnIte
 
         productName = (EditText) view.findViewById(R.id.productNameID);
 
-        colorSpinner = (Spinner) view.findViewById(R.id.colorSpinnerID);
-        sizeSpinner = (Spinner) view.findViewById(R.id.sizeSpinnerID);
-
-        ArrayAdapter colorAdapter = new ArrayAdapter(getActivity(), android.R.layout.simple_spinner_item, colorList);
-        colorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        colorSpinner.setAdapter(colorAdapter);
-
-        ArrayAdapter<String> sizeAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, sizeList);
-        colorAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        sizeSpinner.setAdapter(sizeAdapter);
-        color = "";
-        size = "";
-
-        colorSpinner.setOnItemSelectedListener(this);
-        sizeSpinner.setOnItemSelectedListener(this);
 
         addProductButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 String name = productName.getText().toString().trim();
-                String price = priceText.getText().toString().trim();
                 String description = descriptionText.getText().toString().trim();
 
                 if (TextUtils.isEmpty(name) || TextUtils.isEmpty(description)) {
@@ -178,26 +177,45 @@ public class Add_products_fragment extends Fragment implements AdapterView.OnIte
 
                 } else {
 
-                    if (final_check == 1) {
-                        imgdata = imgToString(bitmap);
-                    } else {
-                        imgdata = "xyz";
-                    }
-                    addProductsViewModel.getProduct(name, color, size, price, description, imgdata).observe(getViewLifecycleOwner(), new Observer<Add_product_response>() {
+                    loader.show();
+                    addProductsViewModel.getProduct(name, description, imgToString(bitmap)).observe(getViewLifecycleOwner(), new Observer<Add_product_response>() {
                         @Override
                         public void onChanged(Add_product_response add_product_response) {
                             String message = add_product_response.getMessage();
 
-                            if (message.equals("inserted")) {
-                                getActivity().getSupportFragmentManager().beginTransaction().setCustomAnimations(
-                                        R.anim.slide_in,  // enter
-                                        R.anim.fade_out,  // exit
-                                        R.anim.fade_in,   // popEnter
-                                        R.anim.slide_out  // popExit
-                                ).replace(R.id.frame_container, new Home_fragment()).commit();
-                                Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
-                            } else {
 
+                            if (!message.equals("invalid")) {
+                                //Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+
+                                if (variant == 1) {
+                                    for (int i = 0; i < variantList.size(); i++) {
+
+                                        add_variant_func(message, variantList.get(i).getColor(), variantList.get(i).getSize(), variantList.get(i).getAmount(), variantList.get(i).getPrice_range());
+                                    }
+                                } else {
+                                    String size = sizeEditText.getText().toString().toLowerCase().trim();
+                                    String color = colorEditText.getText().toString().toLowerCase().trim();
+                                    String amount = amountEditText.getText().toString().trim();
+                                    String price_range = priceRangeEditText.getText().toString().trim();
+
+                                    if (TextUtils.isEmpty(size) || TextUtils.isEmpty(color) || TextUtils.isEmpty(amount) || TextUtils.isEmpty(price_range)) {
+                                        Toast.makeText(getActivity(), "Empty filed", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        productVariant.setSize(size);
+                                        productVariant.setColor(color);
+                                        productVariant.setAmount(amount);
+                                        productVariant.setPrice_range(price_range);
+                                        variantList.add(productVariant);
+
+                                        for (int i = 0; i < variantList.size(); i++) {
+                                            add_variant_func(message, variantList.get(i).getColor(), variantList.get(i).getSize(), variantList.get(i).getAmount(), variantList.get(i).getPrice_range());
+                                        }
+                                    }
+                                }
+
+
+                            } else {
+                                loader.dismiss();
                                 Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
                             }
                         }
@@ -210,35 +228,100 @@ public class Add_products_fragment extends Fragment implements AdapterView.OnIte
             @Override
             public void onClick(View v) {
                 ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, IMAGE_REQUEST_CODE);
-                imageSelect();
+                imageselect();
+            }
+        });
+
+        variantList = new ArrayList<>();
+        productVariant = new Product_variant();
+
+        addVariantButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                variant = 1;
+                String size = sizeEditText.getText().toString().toLowerCase().trim();
+                String color = colorEditText.getText().toString().toLowerCase().trim();
+                String amount = amountEditText.getText().toString().trim();
+                String price_range = priceRangeEditText.getText().toString().trim();
+
+                if (TextUtils.isEmpty(size) || TextUtils.isEmpty(color) || TextUtils.isEmpty(amount) || TextUtils.isEmpty(price_range)) {
+                    Toast.makeText(getActivity(), "Empty filed", Toast.LENGTH_SHORT).show();
+                } else {
+                    productVariant.setSize(size);
+                    productVariant.setColor(color);
+                    productVariant.setAmount(amount);
+                    productVariant.setPrice_range(price_range);
+                    variantList.add(productVariant);
+
+                    sizeEditText.getText().clear();
+                    colorEditText.getText().clear();
+                    amountEditText.getText().clear();
+                    priceRangeEditText.getText().clear();
+
+                    //Toast.makeText(getActivity(), String.valueOf(variantList.size()), Toast.LENGTH_SHORT).show();
+
+                    for (int i = 0; i<variantList.size();i++){
+                        Log.d("variantListXX", String.valueOf(variantList.get(i).getSize()));
+                    }
+
+                }
+
             }
         });
 
         return view;
     }
 
+    private void add_variant_func(String message, String color, String size, String amount, String price_range) {
+        addProductsApi.addFinalResponse(message, color, size, amount, price_range).enqueue(new Callback<Add_product_response>() {
+            @Override
+            public void onResponse(Call<Add_product_response> call, Response<Add_product_response> response) {
+                String message = response.body().getMessage();
+
+                if (message.equals("added")) {
+                    count = count + 1;
+                    if (count == variantList.size()) {
+                        loader.dismiss();
+                        Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+                    }
+
+                } else {
+                    loader.dismiss();
+                    Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Add_product_response> call, Throwable t) {
+                Log.d("errorxx", t.getMessage());
+            }
+        });
+
+    }
+
     private String imgToString(Bitmap bitmap) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
         byte[] imgbytes = byteArrayOutputStream.toByteArray();
+        //long lengthbmp = imgbytes.length;
+
+        //Toast.makeText(getApplicationContext(), String.valueOf(lengthbmp/1024), Toast.LENGTH_SHORT).show();
+
         String encodeimg = Base64.encodeToString(imgbytes, Base64.DEFAULT);
         return encodeimg;
     }
 
-    private void imageSelect() {
-        final CharSequence[] items = {"Camera", "Gallery", "Cancel"};
+    public void imageselect() {
+        final CharSequence[] items = {"Gallery", "Cancel"};
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Add Image");
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int i) {
-
                 if (items[i].equals("Camera")) {
-                    check = 1;
-                    Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     startActivityForResult(intent, CAMERA_REQUEST);
                 } else if (items[i].equals("Gallery")) {
-                    check = 1;
                     Intent intent = new Intent(new Intent(Intent.ACTION_GET_CONTENT));
                     intent.setType("image/*");
                     startActivityForResult(Intent.createChooser(intent, "select image"), IMAGE_REQUEST_CODE);
@@ -249,25 +332,7 @@ public class Add_products_fragment extends Fragment implements AdapterView.OnIte
             }
         });
         builder.show();
-
     }
 
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-        if (parent.getId() == R.id.colorSpinnerID) {
-            color = parent.getItemAtPosition(position).toString();
-        } else if (parent.getId() == R.id.sizeSpinnerID) {
-            size = parent.getItemAtPosition(position).toString();
-        }
-        if (!color.isEmpty() && !size.isEmpty())
-            price_func(color, size);
-
-
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-
-    }
 }

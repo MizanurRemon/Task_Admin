@@ -16,9 +16,15 @@ public interface Add_products_API {
     @FormUrlEncoded
     @POST("/add_products")
     Call<Add_product_response> addResponse(@Field("name") String name,
-                                           @Field("color") String color,
-                                           @Field("size") String size,
-                                           @Field("price") String price,
                                            @Field("description") String description,
                                            @Field("image") String imageData);
+
+
+    @FormUrlEncoded
+    @POST("/add_products_variant")
+    Call<Add_product_response> addFinalResponse(@Field("productID") String productsID,
+                                                @Field("color") String color,
+                                                @Field("size") String size,
+                                                @Field("amount") String amount,
+                                                @Field("price_range") String price_range);
 }

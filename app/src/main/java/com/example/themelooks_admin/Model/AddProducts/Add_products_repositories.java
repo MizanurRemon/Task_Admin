@@ -62,13 +62,13 @@ public class Add_products_repositories {
     }
 
     public @NonNull
-    MutableLiveData<Add_product_response> getProduct( @NonNull String name,@NonNull String color, @NonNull String size,@NonNull String price,@NonNull String description, @NonNull String imageData) {
+    MutableLiveData<Add_product_response> getProduct( @NonNull String name,@NonNull String description, @NonNull String imageData) {
 
         if (message2 == null) {
             message2 = new MutableLiveData<>();
         }
 
-        Call<Add_product_response> call = addProductsApi.addResponse(name, color, size, price, description, imageData);
+        Call<Add_product_response> call = addProductsApi.addResponse(name,  description, imageData);
 
         call.enqueue(new Callback<Add_product_response>() {
             @Override
@@ -85,6 +85,8 @@ public class Add_products_repositories {
                 Add_product_response response = new Add_product_response();
                 response.setMessage("invalid");
                 message2.postValue(response);
+
+                Log.d("errorxx", t.getMessage());
             }
         });
         return message2;

@@ -9,7 +9,7 @@ public class APIUtilize {
     public APIUtilize() {
     }
 
-    public static final String BASE_URL = "http://10.0.2.2:1337/";
+    public static final String BASE_URL = "http://hoh.fsbbazar.com/";
 
 
     public static Login_API loginApi() {

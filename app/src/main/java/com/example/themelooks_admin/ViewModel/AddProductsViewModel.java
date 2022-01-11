@@ -23,9 +23,9 @@ public class AddProductsViewModel extends AndroidViewModel {
 
     }
 
-    public LiveData<Add_product_response> getProduct(String name, String color, String size, String price, String description, String image) {
+    public LiveData<Add_product_response> getProduct(String name,  String description, String image) {
 
-        return Add_products_repositories.getInstance().getProduct(name, color, size, price, description, image);
+        return Add_products_repositories.getInstance().getProduct(name, description, image);
 
     }
 }
