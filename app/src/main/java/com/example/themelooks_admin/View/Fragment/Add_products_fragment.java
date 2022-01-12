@@ -161,6 +161,7 @@ public class Add_products_fragment extends Fragment {
         productName = (EditText) view.findViewById(R.id.productNameID);
 
 
+        //add product button listener
         addProductButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -178,6 +179,8 @@ public class Add_products_fragment extends Fragment {
                 } else {
 
                     loader.show();
+
+                    //add products api CALL
                     addProductsViewModel.getProduct(name, description, imgToString(bitmap)).observe(getViewLifecycleOwner(), new Observer<Add_product_response>() {
                         @Override
                         public void onChanged(Add_product_response add_product_response) {
@@ -208,6 +211,8 @@ public class Add_products_fragment extends Fragment {
                                         variantList.add(productVariant);
 
                                         for (int i = 0; i < variantList.size(); i++) {
+
+                                            //add variant func
                                             add_variant_func(message, variantList.get(i).getColor(), variantList.get(i).getSize(), variantList.get(i).getAmount(), variantList.get(i).getPrice_range());
                                         }
                                     }
@@ -272,6 +277,8 @@ public class Add_products_fragment extends Fragment {
     }
 
     private void add_variant_func(String message, String color, String size, String amount, String price_range) {
+
+        // Call add variant API
         addProductsApi.addFinalResponse(message, color, size, amount, price_range).enqueue(new Callback<Add_product_response>() {
             @Override
             public void onResponse(Call<Add_product_response> call, Response<Add_product_response> response) {
@@ -298,6 +305,8 @@ public class Add_products_fragment extends Fragment {
 
     }
 
+
+    //image to string convert
     private String imgToString(Bitmap bitmap) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
@@ -310,6 +319,7 @@ public class Add_products_fragment extends Fragment {
         return encodeimg;
     }
 
+    //image select
     public void imageselect() {
         final CharSequence[] items = {"Gallery", "Cancel"};
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());

@@ -49,17 +49,15 @@ public class Home_fragment extends Fragment implements Product_adapter.OnItemCli
         addProductsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getActivity().getSupportFragmentManager().beginTransaction().setCustomAnimations(
-                        R.anim.slide_in,  // enter
-                        R.anim.fade_out,  // exit
-                        R.anim.fade_in,   // popEnter
-                        R.anim.slide_out  // popExit
-                ).replace(R.id.frame_container, new Add_products_fragment(userID)).addToBackStack(null).commit();
+                //load products add fragment
+                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, new Add_products_fragment(userID)).addToBackStack(null).commit();
             }
         });
     }
 
     private void main() {
+
+        //load products list
         productsViewModel.getProduct().observe(getViewLifecycleOwner(), new Observer<List<Products_response>>() {
             @Override
             public void onChanged(List<Products_response> products_responses) {

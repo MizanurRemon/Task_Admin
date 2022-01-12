@@ -89,6 +89,8 @@ public class Login_fragment extends Fragment {
     }
 
     private void sendData(String phone, String password) {
+
+        //login API call
         loginViewModel.getMessage(phone, password).observe(getViewLifecycleOwner(), new Observer<Login_response>() {
             @Override
             public void onChanged(Login_response login_response) {

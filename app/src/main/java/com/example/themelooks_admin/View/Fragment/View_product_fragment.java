@@ -58,6 +58,8 @@ public class View_product_fragment extends Fragment {
     }
 
     private void product_variant_list() {
+
+        //product variant list call
         productsApi.getProductVariant(productID).enqueue(new Callback<List<Products_variant_response>>() {
             @Override
             public void onResponse(Call<List<Products_variant_response>> call, Response<List<Products_variant_response>> response) {
@@ -77,7 +79,7 @@ public class View_product_fragment extends Fragment {
 
     private void main() {
 
-       // Toast.makeText(getActivity(), "main", Toast.LENGTH_SHORT).show();
+       // product details API call
         productsApi.getProductDetails(productID).enqueue(new Callback<Products_response>() {
             @Override
             public void onResponse(Call<Products_response> call, Response<Products_response> response) {
@@ -98,6 +100,8 @@ public class View_product_fragment extends Fragment {
 
     }
 
+
+    //string to image convertion
     public Bitmap StringToBitMap(String encodedString) {
         try {
             byte[] encodeByte = Base64.decode(encodedString, Base64.DEFAULT);
